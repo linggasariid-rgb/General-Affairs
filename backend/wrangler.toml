@@ -1,0 +1,27 @@
+name = "ga-enterprise-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# Environment variables
+[vars]
+SUPABASE_URL = "https://yprhnqjzmhbqlgtdnxby.supabase.co"
+SUPABASE_SERVICE_KEY = "sb_secret_waKfO-zC82DRMYR8YemjYA_jj5M9jGP"
+JWT_SECRET = "ga-enterprise-jwt-secret-key-2026"
+APP_NAME = "GA Enterprise System"
+APP_ENV = "production"
+
+# Routes
+routes = [
+  { pattern = "api.company.com", custom_domain = true }
+]
+
+# D1 or other bindings if needed
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "ga-enterprise"
+# database_id = "your-database-id"
+
+# Logging
+[observability]
+enabled = true
+head_sampling_rate = 0.1
