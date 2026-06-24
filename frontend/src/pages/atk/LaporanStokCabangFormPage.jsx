@@ -114,11 +114,8 @@ export default function LaporanStokCabangFormPage() {
   }
 
   function handleCabangChange(idCabang) {
-    setForm({ ...form, id_cabang: idCabang, id_gudang: '' });
-    const cabangGudang = gudangList.filter(g => g.id_cabang === idCabang || g.tipe === 'cabang');
-    if (cabangGudang.length === 1) {
-      setForm(f => ({ ...f, id_cabang: idCabang, id_gudang: cabangGudang[0].id }));
-    }
+    const pusat = gudangList.find(g => g.tipe === 'pusat');
+    setForm({ ...form, id_cabang: idCabang, id_gudang: pusat?.id || '' });
   }
 
   if (loading) return <div className="text-center py-5"><div className="spinner-border" /></div>;
@@ -148,7 +145,7 @@ export default function LaporanStokCabangFormPage() {
                 <label className="form-label">Gudang <span className="text-danger">*</span></label>
                 <select className="form-select" value={form.id_gudang} onChange={(e) => setForm({ ...form, id_gudang: e.target.value })} required disabled={isEdit}>
                   <option value="">-- Pilih --</option>
-                  {gudangList.filter(g => g.id_cabang === form.id_cabang || g.tipe === 'cabang').map(g => <option key={g.id} value={g.id}>{g.nama}</option>)}
+                  {gudangList.map(g => <option key={g.id} value={g.id}>{g.nama}</option>)}
                 </select>
               </div>
               <div className="col-md-2">
