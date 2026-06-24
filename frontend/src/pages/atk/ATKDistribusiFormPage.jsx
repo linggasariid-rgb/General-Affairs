@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { atkApi } from '../../services/api';
+import { atkApi, masterApi } from '../../services/api';
 
 export default function ATKDistribusiFormPage() {
   const navigate = useNavigate();
@@ -14,8 +14,8 @@ export default function ATKDistribusiFormPage() {
   const [items, setItems] = useState([{ id_item: '', nama_item: '', qty_direncanakan: 1 }]);
 
   useEffect(() => {
-    fetch('/api/v1/master/cabang?perPage=100').then(r => r.json()).then(res => { if (res.success) setCabangList(res.data); }).catch(console.error);
-    fetch('/api/v1/master/gudang?perPage=100').then(r => r.json()).then(res => {
+    masterApi.cabang.list({ perPage: '100' }).then(res => { if (res.success) setCabangList(res.data); }).catch(console.error);
+    masterApi.gudang.list({ perPage: '100' }).then(res => {
       if (res.success) {
         const ga = res.data.find(g => g.tipe === 'pusat');
         setGudangGA(ga);

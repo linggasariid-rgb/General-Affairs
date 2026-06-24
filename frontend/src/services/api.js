@@ -46,6 +46,12 @@ export const masterApi = {
     update: (id, data) => request(`/master/cabang/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id) => request(`/master/cabang/${id}`, { method: 'DELETE' }),
   },
+  gudang: {
+    list: (params) => request(`/master/gudang?${new URLSearchParams(params)}`),
+    get: (id) => request(`/master/gudang/${id}`),
+    create: (data) => request('/master/gudang', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/master/gudang/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  },
   vendor: {
     list: (params) => request(`/master/vendor?${new URLSearchParams(params)}`),
     get: (id) => request(`/master/vendor/${id}`),
