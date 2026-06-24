@@ -88,6 +88,7 @@ export const MODUL = {
   DASHBOARD: 'dashboard',
   REPORT: 'report',
   AUDIT: 'audit',
+  ATK: 'atk',
 } as const;
 
 export const SLA_HOURS: Record<string, number> = {

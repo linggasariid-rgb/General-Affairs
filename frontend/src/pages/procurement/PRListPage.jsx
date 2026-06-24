@@ -36,7 +36,7 @@ export default function PRListPage() {
           <h4 className="mb-1">Purchase Request</h4>
           <small className="text-muted">{data.length} total PR</small>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate('/procurement/pr/add')}>
+        <button className="btn btn-primary" onClick={() => navigate('/procurement/pr/new')}>
           <i className="bi bi-plus-lg me-1"></i>Buat PR
         </button>
       </div>

@@ -9,6 +9,8 @@ import vendor from './v1/master/vendor';
 import kategoriAsset from './v1/master/kategori-asset';
 import lokasiAsset from './v1/master/lokasi-asset';
 import jenisMaintenance from './v1/master/jenis-maintenance';
+import produk from './v1/master/produk';
+import vendorKategori from './v1/master/vendor-kategori';
 
 // Transaction
 import asset from './v1/asset/index';
@@ -25,6 +27,13 @@ import penerimaan from './v1/procurement/penerimaan';
 import vehicleBooking from './v1/vehicle/booking';
 import buildingChecklist from './v1/building/checklist';
 import buildingIssue from './v1/building/issue';
+
+// ATK
+import atkItem from './v1/atk/item';
+import atkKategori from './v1/atk/kategori';
+import atkStock from './v1/atk/stock';
+import atkDistribusi from './v1/atk/distribusi';
+import atkPenerimaan from './v1/atk/penerimaan';
 
 // System
 import auth from './v1/auth';
@@ -47,6 +56,8 @@ router.route('/master/vendor', vendor);
 router.route('/master/kategori-asset', kategoriAsset);
 router.route('/master/lokasi-asset', lokasiAsset);
 router.route('/master/jenis-maintenance', jenisMaintenance);
+router.route('/master/produk', produk);
+router.route('/master/vendor/kategori', vendorKategori);
 
 // Asset Management
 router.route('/asset', asset);
@@ -71,6 +82,13 @@ router.route('/vehicle/booking', vehicleBooking);
 // Building
 router.route('/building/checklist', buildingChecklist);
 router.route('/building/issue', buildingIssue);
+
+// ATK
+router.route('/atk/item', atkItem);
+router.route('/atk/kategori', atkKategori);
+router.route('/atk/stock', atkStock);
+router.route('/atk/distribusi', atkDistribusi);
+router.route('/atk/penerimaan', atkPenerimaan);
 
 // Dashboard
 router.route('/dashboard/head-ga', dashboard);

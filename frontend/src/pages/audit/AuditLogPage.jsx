@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../../services/api';
 
 export default function AuditLogPage() {
   const [logs, setLogs] = useState([]);
@@ -10,8 +11,7 @@ export default function AuditLogPage() {
   async function fetchLogs() {
     try {
       const params = new URLSearchParams({ page: '1', perPage: '50', ...filter });
-      const res = await fetch(`/api/v1/audit?${params}`);
-      const data = await res.json();
+      const data = await apiFetch(`/audit?${params}`);
       if (data.success) setLogs(data.data);
     } catch (err) {
       console.error(err);

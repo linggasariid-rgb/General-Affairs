@@ -108,6 +108,7 @@ pr.post('/', async (c) => {
     estimasi_harga: item.estimasi_harga,
     total_estimasi: (item.estimasi_harga || 0) * item.jumlah,
     keterangan: item.keterangan,
+    id_produk: item.id_produk || null,
   }));
 
   const { error: itemsError } = await supabase

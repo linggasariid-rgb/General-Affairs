@@ -7,7 +7,7 @@ export default function CabangPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [form, setForm] = useState({ kode: '', nama: '', kota: '', provinsi: '', alamat: '', telepon: '', email: '' });
+  const [form, setForm] = useState({ kode: '', nama: '', kota: '', provinsi: '', alamat: '', telepon: '', email: '', kode_pos: '' });
 
   useEffect(() => { fetchData(); }, []);
 
@@ -25,10 +25,10 @@ export default function CabangPage() {
   function openModal(item = null) {
     if (item) {
       setEditItem(item);
-      setForm({ kode: item.kode, nama: item.nama, kota: item.kota, provinsi: item.provinsi, alamat: item.alamat || '', telepon: item.telepon || '', email: item.email || '' });
+      setForm({ kode: item.kode, nama: item.nama, kota: item.kota, provinsi: item.provinsi, alamat: item.alamat || '', telepon: item.telepon || '', email: item.email || '', kode_pos: item.kode_pos || '' });
     } else {
       setEditItem(null);
-      setForm({ kode: '', nama: '', kota: '', provinsi: '', alamat: '', telepon: '', email: '' });
+      setForm({ kode: '', nama: '', kota: '', provinsi: '', alamat: '', telepon: '', email: '', kode_pos: '' });
     }
     setShowModal(true);
   }
@@ -47,6 +47,15 @@ export default function CabangPage() {
       fetchData();
     } catch (err) {
       Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function toggleActive(item) {
+    try {
+      await masterApi.cabang.update(item.id, { status: !item.status });
+      fetchData();
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -88,8 +97,11 @@ export default function CabangPage() {
                   <td>{item.telepon || '-'}</td>
                   <td><span className={`badge bg-${item.status ? 'success' : 'secondary'}`}>{item.status ? 'Aktif' : 'Nonaktif'}</span></td>
                   <td>
-                    <button className="btn btn-sm btn-outline-primary" onClick={() => openModal(item)}>
+                    <button className="btn btn-sm btn-outline-primary me-1" onClick={() => openModal(item)}>
                       <i className="bi bi-pencil"></i>
+                    </button>
+                    <button className={`btn btn-sm ${item.status ? 'btn-outline-warning' : 'btn-outline-success'}`} onClick={() => toggleActive(item)}>
+                      <i className={`bi ${item.status ? 'bi-toggle-off' : 'bi-toggle-on'}`}></i>
                     </button>
                   </td>
                 </tr>
@@ -131,13 +143,17 @@ export default function CabangPage() {
                       <label className="form-label">Alamat</label>
                       <textarea className="form-control" rows="2" value={form.alamat} onChange={(e) => setForm({ ...form, alamat: e.target.value })}></textarea>
                     </div>
-                    <div className="col-md-6">
+                    <div className="col-md-4">
                       <label className="form-label">Telepon</label>
                       <input className="form-control" value={form.telepon} onChange={(e) => setForm({ ...form, telepon: e.target.value })} />
                     </div>
-                    <div className="col-md-6">
+                    <div className="col-md-4">
                       <label className="form-label">Email</label>
                       <input className="form-control" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label">Kode Pos</label>
+                      <input className="form-control" value={form.kode_pos} onChange={(e) => setForm({ ...form, kode_pos: e.target.value })} />
                     </div>
                   </div>
                 </div>

@@ -105,6 +105,55 @@ export const procurementApi = {
   },
 };
 
+// Produk
+export const produkApi = {
+  list: (params) => request(`/master/produk?${new URLSearchParams(params)}`),
+  all: (params) => request(`/master/produk/all?${new URLSearchParams(params)}`),
+  get: (id) => request(`/master/produk/${id}`),
+  create: (data) => request('/master/produk', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => request(`/master/produk/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+};
+
+// ATK
+export const atkApi = {
+  item: {
+    list: (params) => request(`/atk/item?${new URLSearchParams(params)}`),
+    all: (params) => request(`/atk/item/all?${new URLSearchParams(params)}`),
+    get: (id) => request(`/atk/item/${id}`),
+    create: (data) => request('/atk/item', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/atk/item/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id) => request(`/atk/item/${id}`, { method: 'DELETE' }),
+  },
+  kategori: {
+    list: () => request('/atk/kategori'),
+    get: (id) => request(`/atk/kategori/${id}`),
+    create: (data) => request('/atk/kategori', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/atk/kategori/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id) => request(`/atk/kategori/${id}`, { method: 'DELETE' }),
+  },
+  stock: {
+    list: (params) => request(`/atk/stock?${new URLSearchParams(params)}`),
+    byGudang: (idGudang) => request(`/atk/stock/gudang/${idGudang}`),
+    adjust: (data) => request('/atk/stock/adjust', { method: 'POST', body: JSON.stringify(data) }),
+    mutasi: (data) => request('/atk/stock/mutasi', { method: 'POST', body: JSON.stringify(data) }),
+  },
+  distribusi: {
+    list: (params) => request(`/atk/distribusi?${new URLSearchParams(params)}`),
+    get: (id) => request(`/atk/distribusi/${id}`),
+    create: (data) => request('/atk/distribusi', { method: 'POST', body: JSON.stringify(data) }),
+    submit: (id) => request(`/atk/distribusi/${id}/submit`, { method: 'PUT' }),
+    approve: (id) => request(`/atk/distribusi/${id}/approve`, { method: 'PUT' }),
+    reject: (id) => request(`/atk/distribusi/${id}/reject`, { method: 'PUT' }),
+    kirim: (id, data) => request(`/atk/distribusi/${id}/kirim`, { method: 'PUT', body: JSON.stringify(data) }),
+    selesai: (id) => request(`/atk/distribusi/${id}/selesai`, { method: 'PUT' }),
+  },
+  penerimaan: {
+    list: (params) => request(`/atk/penerimaan?${new URLSearchParams(params)}`),
+    get: (id) => request(`/atk/penerimaan/${id}`),
+    create: (data) => request('/atk/penerimaan', { method: 'POST', body: JSON.stringify(data) }),
+  },
+};
+
 // Dashboard
 export const dashboardApi = {
   headGA: () => request('/dashboard/head-ga'),
@@ -117,4 +166,10 @@ export const reportApi = {
   procurement: (params) => request(`/report/procurement?${new URLSearchParams(params)}`),
 };
 
-export default { supabase, authApi, masterApi, assetApi, maintenanceApi, procurementApi, dashboardApi, reportApi };
+async function apiFetch(endpoint, options = {}) {
+  return request(endpoint, options);
+}
+
+export { request as apiFetch };
+
+export default { supabase, authApi, masterApi, assetApi, maintenanceApi, procurementApi, produkApi, atkApi, dashboardApi, reportApi };

@@ -1,13 +1,28 @@
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
-  const { login, loading } = useAuth();
+  const { login, loginWithEmail, loading } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  async function handleLogin() {
+  async function handleGoogle() {
     try {
+      setError('');
       await login();
     } catch (err) {
-      console.error(err);
+      setError(err.message);
+    }
+  }
+
+  async function handleEmailLogin(e) {
+    e.preventDefault();
+    try {
+      setError('');
+      await loginWithEmail(email, password);
+    } catch (err) {
+      setError(err.message);
     }
   }
 
@@ -21,11 +36,26 @@ export default function LoginPage() {
             <p className="text-muted small">General Affairs Management System</p>
           </div>
 
-          <button
-            className="btn btn-light border btn-lg w-100 d-flex align-items-center justify-content-center gap-2"
-            onClick={handleLogin}
-            disabled={loading}
-          >
+          {error && <div className="alert alert-danger py-2 small">{error}</div>}
+
+          <form onSubmit={handleEmailLogin}>
+            <div className="mb-3 text-start">
+              <label className="form-label small">Email</label>
+              <input type="email" className="form-control" value={email} onChange={e => setEmail(e.target.value)} placeholder="nama@company.com" required />
+            </div>
+            <div className="mb-3 text-start">
+              <label className="form-label small">Password</label>
+              <input type="password" className="form-control" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />
+            </div>
+            <button type="submit" className="btn btn-primary btn-lg w-100" disabled={loading}>
+              {loading ? 'Memproses...' : 'Masuk'}
+            </button>
+          </form>
+
+          <hr className="my-4" />
+          <div className="text-muted small mb-3">atau</div>
+
+          <button className="btn btn-light border btn-lg w-100 d-flex align-items-center justify-content-center gap-2" onClick={handleGoogle} disabled={loading}>
             <img src="https://www.google.com/favicon.ico" alt="Google" width="20" />
             <span>Masuk dengan Google</span>
           </button>

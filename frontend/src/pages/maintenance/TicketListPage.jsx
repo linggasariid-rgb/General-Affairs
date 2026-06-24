@@ -36,7 +36,7 @@ export default function TicketListPage() {
           <h4 className="mb-1">Maintenance Ticket</h4>
           <small className="text-muted">Kelola ticket perbaikan dan perawatan</small>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate('/maintenance/ticket/add')}>
+        <button className="btn btn-primary" onClick={() => navigate('/maintenance/ticket/new')}>
           <i className="bi bi-plus-lg me-1"></i>Buat Ticket
         </button>
       </div>

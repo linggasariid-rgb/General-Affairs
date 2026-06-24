@@ -51,6 +51,15 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   }
 
+  async function loginWithEmail(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    if (data?.user) {
+      setUser(data.user);
+      fetchProfile(data.user.email);
+    }
+  }
+
   async function logout() {
     await supabase.auth.signOut();
     setUser(null);
@@ -70,7 +79,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, logout, hasRole, can }}>
+    <AuthContext.Provider value={{ user, profile, loading, login, loginWithEmail, logout, hasRole, can }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,20 +1,77 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Chart, registerables } from 'chart.js';
 import KPICard from '../../components/dashboard/KPICard';
+import { dashboardApi } from '../../services/api';
+
+Chart.register(...registerables);
 
 export default function HeadGADashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const assetChartRef = useRef(null);
+  const statusChartRef = useRef(null);
+  const trendChartRef = useRef(null);
+  const assetChartInstance = useRef(null);
+  const statusChartInstance = useRef(null);
+  const trendChartInstance = useRef(null);
 
   useEffect(() => {
     fetchDashboard();
   }, []);
 
+  useEffect(() => {
+    if (!stats) return;
+    if (assetChartInstance.current) assetChartInstance.current.destroy();
+    if (statusChartInstance.current) statusChartInstance.current.destroy();
+    if (trendChartInstance.current) trendChartInstance.current.destroy();
+
+    const colors = ['#0d6efd','#6610f2','#6f42c1','#d63384','#dc3545','#fd7e14','#ffc107','#198754','#20c997','#0dcaf0'];
+    const cabangLabels = (stats.assetPerCabang || []).map(c => c.nama);
+    const cabangData = (stats.assetPerCabang || []).map(c => c.total);
+
+    if (assetChartRef.current) {
+      assetChartInstance.current = new Chart(assetChartRef.current, {
+        type: 'bar',
+        data: {
+          labels: cabangLabels.length ? cabangLabels : ['Cabang A','Cabang B'],
+          datasets: [{ label: 'Jumlah Asset', data: cabangData.length ? cabangData : [0,0], backgroundColor: colors.slice(0, cabangData.length || 2) }],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
+      });
+    }
+
+    if (statusChartRef.current) {
+      statusChartInstance.current = new Chart(statusChartRef.current, {
+        type: 'doughnut',
+        data: {
+          labels: ['Aktif', 'Rusak', 'Dipinjam', 'Hapus'],
+          datasets: [{ data: [stats.assetAktif||0, stats.assetRusak||0, stats.assetDipinjam||0, stats.assetDihapus||0], backgroundColor: ['#198754','#dc3545','#ffc107','#6c757d'] }],
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } },
+      });
+    }
+
+    if (trendChartRef.current) {
+      const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+      trendChartInstance.current = new Chart(trendChartRef.current, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [
+            { label: 'Ticket Masuk', data: stats.trendTicket || Array(12).fill(0), borderColor: '#0d6efd', fill: false, tension: 0.3 },
+            { label: 'PR Dibuat', data: stats.trendPR || Array(12).fill(0), borderColor: '#198754', fill: false, tension: 0.3 },
+          ],
+        },
+        options: { responsive: true, maintainAspectRatio: false, interaction: { intersect: false, mode: 'index' } },
+      });
+    }
+  }, [stats]);
+
   async function fetchDashboard() {
     try {
-      const res = await fetch('/api/v1/dashboard/head-ga');
-      const data = await res.json();
+      const data = await dashboardApi.headGA();
       if (data.success) setStats(data.data);
     } catch (err) {
       console.error(err);
@@ -74,8 +131,8 @@ export default function HeadGADashboard() {
               <h6 className="mb-0">Asset per Cabang</h6>
               <small className="text-muted">Distribusi aset aktif</small>
             </div>
-            <div className="card-body">
-              <canvas id="assetChart" height="250"></canvas>
+            <div className="card-body" style={{ height: 300 }}>
+              <canvas ref={assetChartRef}></canvas>
             </div>
           </div>
         </div>
@@ -86,8 +143,20 @@ export default function HeadGADashboard() {
             <div className="card-header bg-white">
               <h6 className="mb-0">Status Asset</h6>
             </div>
-            <div className="card-body">
-              <canvas id="statusChart" height="250"></canvas>
+            <div className="card-body" style={{ height: 300 }}>
+              <canvas ref={statusChartRef}></canvas>
+            </div>
+          </div>
+        </div>
+
+        {/* Trend Chart */}
+        <div className="col-12">
+          <div className="card shadow-sm">
+            <div className="card-header bg-white">
+              <h6 className="mb-0">Trend Bulanan</h6>
+            </div>
+            <div className="card-body" style={{ height: 250 }}>
+              <canvas ref={trendChartRef}></canvas>
             </div>
           </div>
         </div>

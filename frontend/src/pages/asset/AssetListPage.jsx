@@ -41,7 +41,7 @@ export default function AssetListPage() {
           <h4 className="mb-1">Daftar Asset</h4>
           <small className="text-muted">Total {meta.total} asset</small>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate('/asset/add')}>
+        <button className="btn btn-primary" onClick={() => navigate('/asset/new')}>
           <i className="bi bi-plus-lg me-1"></i>Registrasi Asset
         </button>
       </div>

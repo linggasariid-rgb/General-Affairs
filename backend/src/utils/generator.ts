@@ -45,3 +45,7 @@ export function generateKodeKendaraan(urutan: number): string {
 export function generateKodeLokasi(kodeCabang: string, urutan: number): string {
   return `LOK-${kodeCabang}-${String(urutan).padStart(4, '0')}`;
 }
+
+export function generateNomorDistribusi(_env: string, tahun: number, urutan: number): string {
+  return `DST-${tahun}-${String(urutan).padStart(5, '0')}`;
+}
