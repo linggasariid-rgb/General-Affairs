@@ -15,7 +15,7 @@ app.get('/', async (c) => {
   const page = parseInt(c.req.query('page') || '1');
   const perPage = parseInt(c.req.query('perPage') || '10');
 
-  let query = supabase.from('gudang').select('*, cabang!inner(nama, kode)', { count: 'exact' });
+  let query = supabase.from('gudang').select('*, cabang(nama, kode)', { count: 'exact' });
 
   if (c.req.query('id_cabang')) query = query.eq('id_cabang', c.req.query('id_cabang'));
   if (c.req.query('tipe')) query = query.eq('tipe', c.req.query('tipe'));
