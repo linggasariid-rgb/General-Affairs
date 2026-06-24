@@ -20,6 +20,7 @@ const MIGRATION_FILES = [
   '010_seed_cabang_gudang.sql',
   '011_schema_atk_laporan_stok_cabang.sql',
   '012_seed_users_admin_cabang.sql',
+  '013_schema_pengajuan_non_rutin.sql',
 ];
 
 function splitSQL(sql) {

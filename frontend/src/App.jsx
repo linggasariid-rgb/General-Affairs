@@ -44,6 +44,9 @@ import ATKDistribusiDetailPage from './pages/atk/ATKDistribusiDetailPage';
 import ATKPenerimaanPage from './pages/atk/ATKPenerimaanPage';
 import LaporanStokCabangPage from './pages/atk/LaporanStokCabangPage';
 import LaporanStokCabangFormPage from './pages/atk/LaporanStokCabangFormPage';
+import PengajuanNonRutinPage from './pages/atk/PengajuanNonRutinPage';
+import PengajuanNonRutinFormPage from './pages/atk/PengajuanNonRutinFormPage';
+import PengajuanNonRutinDetailPage from './pages/atk/PengajuanNonRutinDetailPage';
 
 import AuditLogPage from './pages/audit/AuditLogPage';
 
@@ -119,6 +122,9 @@ export default function App() {
         <Route path="atk/laporan-stok-cabang" element={<LaporanStokCabangPage />} />
         <Route path="atk/laporan-stok-cabang/new" element={<LaporanStokCabangFormPage />} />
         <Route path="atk/laporan-stok-cabang/:id/edit" element={<LaporanStokCabangFormPage />} />
+        <Route path="atk/pengajuan-barang-non-rutin" element={<PengajuanNonRutinPage />} />
+        <Route path="atk/pengajuan-barang-non-rutin/new" element={<PengajuanNonRutinFormPage />} />
+        <Route path="atk/pengajuan-barang-non-rutin/:id" element={<PengajuanNonRutinDetailPage />} />
 
         {/* Audit */}
         <Route path="audit" element={<AuditLogPage />} />

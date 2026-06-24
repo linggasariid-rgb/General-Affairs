@@ -158,6 +158,16 @@ export const atkApi = {
     get: (id) => request(`/atk/penerimaan/${id}`),
     create: (data) => request('/atk/penerimaan', { method: 'POST', body: JSON.stringify(data) }),
   },
+  pengajuan: {
+    list: (params) => request(`/atk/pengajuan-barang-non-rutin?${new URLSearchParams(params)}`),
+    get: (id) => request(`/atk/pengajuan-barang-non-rutin/${id}`),
+    create: (data) => request('/atk/pengajuan-barang-non-rutin', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/atk/pengajuan-barang-non-rutin/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    proses: (id) => request(`/atk/pengajuan-barang-non-rutin/${id}/proses`, { method: 'POST' }),
+    setujui: (id) => request(`/atk/pengajuan-barang-non-rutin/${id}/setujui`, { method: 'POST' }),
+    tolak: (id, data) => request(`/atk/pengajuan-barang-non-rutin/${id}/tolak`, { method: 'POST', body: JSON.stringify(data) }),
+    ajukanFinance: (id) => request(`/atk/pengajuan-barang-non-rutin/${id}/ajukan-finance`, { method: 'POST' }),
+  },
   laporan: {
     list: (params) => request(`/atk/laporan-stok-cabang?${new URLSearchParams(params)}`),
     get: (id) => request(`/atk/laporan-stok-cabang/${id}`),

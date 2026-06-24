@@ -53,3 +53,7 @@ export function generateNomorDistribusi(_env: string, tahun: number, urutan: num
 export function generateNomorLaporanStokCabang(tahun: number, urutan: number): string {
   return `LSC-${tahun}-${String(urutan).padStart(5, '0')}`;
 }
+
+export function generateNomorPengajuanNonRutin(tahun: number, urutan: number): string {
+  return `PBN-${tahun}-${String(urutan).padStart(5, '0')}`;
+}
