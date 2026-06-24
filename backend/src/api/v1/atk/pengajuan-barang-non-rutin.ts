@@ -51,7 +51,7 @@ app.get('/:id', async (c) => {
   return success(c, data);
 });
 
-app.post('/', async (c) => {
+app.post('/', requireRole(['SA', 'HGA', 'SGA']), async (c) => {
   const supabase = getSupabase(c.env);
   const user = c.get('user');
   const body = await c.req.json();

@@ -53,7 +53,7 @@ CREATE POLICY pbnr_select_own ON pengajuan_barang_non_rutin FOR SELECT USING (
     created_by = auth.uid()
 );
 CREATE POLICY pbnr_insert ON pengajuan_barang_non_rutin FOR INSERT WITH CHECK (
-    has_role(ARRAY['SA', 'HGA', 'SGA', 'KCB', 'PCB', 'KGD', 'PGD'])
+    has_role(ARRAY['SA', 'HGA', 'SGA'])
 );
 CREATE POLICY pbnr_update ON pengajuan_barang_non_rutin FOR UPDATE USING (
     has_role(ARRAY['SA', 'HGA', 'SGA'])
@@ -63,7 +63,7 @@ CREATE POLICY pbnr_item_select ON pengajuan_barang_non_rutin_item FOR SELECT USI
     id_pengajuan IN (SELECT id FROM pengajuan_barang_non_rutin)
 );
 CREATE POLICY pbnr_item_insert ON pengajuan_barang_non_rutin_item FOR INSERT WITH CHECK (
-    has_role(ARRAY['SA', 'HGA', 'SGA', 'KCB', 'PCB', 'KGD', 'PGD'])
+    has_role(ARRAY['SA', 'HGA', 'SGA'])
 );
 CREATE POLICY pbnr_item_update ON pengajuan_barang_non_rutin_item FOR UPDATE USING (
     has_role(ARRAY['SA', 'HGA', 'SGA'])
