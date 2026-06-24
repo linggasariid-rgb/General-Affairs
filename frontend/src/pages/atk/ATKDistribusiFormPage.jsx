@@ -5,7 +5,7 @@ import { atkApi } from '../../services/api';
 export default function ATKDistribusiFormPage() {
   const navigate = useNavigate();
   const [cabangList, setCabangList] = useState([]);
-  const [gudangList, setGudangList] = useState([]);
+  const [gudangGA, setGudangGA] = useState(null);
   const [itemList, setItemList] = useState([]);
   const [saving, setSaving] = useState(false);
 
@@ -15,7 +15,13 @@ export default function ATKDistribusiFormPage() {
 
   useEffect(() => {
     fetch('/api/v1/master/cabang?perPage=100').then(r => r.json()).then(res => { if (res.success) setCabangList(res.data); }).catch(console.error);
-    fetch('/api/v1/master/gudang?perPage=100').then(r => r.json()).then(res => { if (res.success) setGudangList(res.data); }).catch(console.error);
+    fetch('/api/v1/master/gudang?perPage=100').then(r => r.json()).then(res => {
+      if (res.success) {
+        const ga = res.data.find(g => g.tipe === 'pusat');
+        setGudangGA(ga);
+        if (ga) setForm(f => ({ ...f, id_gudang: ga.id }));
+      }
+    }).catch(console.error);
     atkApi.item.all().then(res => setItemList(res.data)).catch(console.error);
   }, []);
 
@@ -81,11 +87,8 @@ export default function ATKDistribusiFormPage() {
                 </select>
               </div>
               <div className="col-md-3">
-                <label className="form-label">Gudang Asal <span className="text-danger">*</span></label>
-                <select className="form-select" value={form.id_gudang} onChange={(e) => setForm({ ...form, id_gudang: e.target.value })} required>
-                  <option value="">-- Pilih --</option>
-                  {gudangList.map(g => <option key={g.id} value={g.id}>{g.nama}</option>)}
-                </select>
+                <label className="form-label">Gudang Asal</label>
+                <input className="form-control" value={gudangGA?.nama || '-'} disabled />
               </div>
               <div className="col-md-2">
                 <label className="form-label">Bulan</label>
