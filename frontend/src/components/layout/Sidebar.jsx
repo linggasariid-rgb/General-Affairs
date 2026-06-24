@@ -8,6 +8,7 @@ const atkItems = [
   { to: '/atk/penerimaan', icon: 'bi-check-circle', label: 'Penerimaan' },
   { to: '/atk/laporan-stok-cabang', icon: 'bi-clipboard-data', label: 'Laporan Stok Cabang' },
   { to: '/atk/pengajuan-barang-non-rutin', icon: 'bi-file-earmark-text', label: 'Pengajuan Non Rutin' },
+  { to: '/atk/perjalanan-dinas', icon: 'bi-car-front', label: 'Perjalanan Dinas' },
 ];
 
 const menuItems = {

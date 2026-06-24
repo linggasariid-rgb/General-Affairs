@@ -36,6 +36,7 @@ import atkDistribusi from './v1/atk/distribusi';
 import atkPenerimaan from './v1/atk/penerimaan';
 import atkLaporanStokCabang from './v1/atk/laporan-stok-cabang';
 import atkPengajuanNonRutin from './v1/atk/pengajuan-barang-non-rutin';
+import atkPerjalananDinas from './v1/atk/perjalanan-dinas';
 
 // System
 import auth from './v1/auth';
@@ -93,6 +94,7 @@ router.route('/atk/distribusi', atkDistribusi);
 router.route('/atk/penerimaan', atkPenerimaan);
 router.route('/atk/laporan-stok-cabang', atkLaporanStokCabang);
 router.route('/atk/pengajuan-barang-non-rutin', atkPengajuanNonRutin);
+router.route('/atk/perjalanan-dinas', atkPerjalananDinas);
 
 // Dashboard
 router.route('/dashboard/head-ga', dashboard);
