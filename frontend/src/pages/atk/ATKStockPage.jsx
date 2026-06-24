@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { atkApi } from '../../services/api';
+import { atkApi, masterApi } from '../../services/api';
 
 export default function ATKStockPage() {
   const [data, setData] = useState([]);
@@ -10,7 +10,7 @@ export default function ATKStockPage() {
   const [adjustForm, setAdjustForm] = useState({ id_item: '', id_gudang: '', qty: 0 });
 
   useEffect(() => {
-    fetch('/api/v1/master/gudang?perPage=100').then(r => r.json()).then(res => {
+    masterApi.gudang.list({ perPage: '100' }).then(res => {
       if (res.success) setGudangList(res.data);
     }).catch(console.error);
   }, []);
