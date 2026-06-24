@@ -158,6 +158,15 @@ export const atkApi = {
     get: (id) => request(`/atk/penerimaan/${id}`),
     create: (data) => request('/atk/penerimaan', { method: 'POST', body: JSON.stringify(data) }),
   },
+  laporan: {
+    list: (params) => request(`/atk/laporan-stok-cabang?${new URLSearchParams(params)}`),
+    get: (id) => request(`/atk/laporan-stok-cabang/${id}`),
+    create: (data) => request('/atk/laporan-stok-cabang', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/atk/laporan-stok-cabang/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    submit: (id) => request(`/atk/laporan-stok-cabang/${id}/submit`, { method: 'POST' }),
+    verifikasi: (id, data) => request(`/atk/laporan-stok-cabang/${id}/verifikasi`, { method: 'POST', body: JSON.stringify(data) }),
+    delete: (id) => request(`/atk/laporan-stok-cabang/${id}`, { method: 'DELETE' }),
+  },
 };
 
 // Dashboard

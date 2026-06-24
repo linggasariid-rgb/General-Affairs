@@ -49,3 +49,7 @@ export function generateKodeLokasi(kodeCabang: string, urutan: number): string {
 export function generateNomorDistribusi(_env: string, tahun: number, urutan: number): string {
   return `DST-${tahun}-${String(urutan).padStart(5, '0')}`;
 }
+
+export function generateNomorLaporanStokCabang(tahun: number, urutan: number): string {
+  return `LSC-${tahun}-${String(urutan).padStart(5, '0')}`;
+}

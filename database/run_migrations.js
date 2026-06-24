@@ -18,6 +18,7 @@ const MIGRATION_FILES = [
   '008_produk.sql',
   '009_schema_atk.sql',
   '010_seed_cabang_gudang.sql',
+  '011_schema_atk_laporan_stok_cabang.sql',
 ];
 
 function splitSQL(sql) {

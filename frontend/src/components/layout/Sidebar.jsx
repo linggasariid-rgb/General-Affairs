@@ -6,6 +6,7 @@ const atkItems = [
   { to: '/atk/stock', icon: 'bi-cpu', label: 'Stock' },
   { to: '/atk/distribusi', icon: 'bi-truck', label: 'Distribusi' },
   { to: '/atk/penerimaan', icon: 'bi-check-circle', label: 'Penerimaan' },
+  { to: '/atk/laporan-stok-cabang', icon: 'bi-clipboard-data', label: 'Laporan Stok Cabang' },
 ];
 
 const menuItems = {
