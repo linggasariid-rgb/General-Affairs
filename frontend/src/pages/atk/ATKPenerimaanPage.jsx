@@ -67,6 +67,9 @@ export default function ATKPenerimaanPage() {
   }
 
   async function openForm() {
+    setSelectedDistribusi(null);
+    setReceiveItems([]);
+    setForm({ id_distribusi: '', id_cabang: '', tanggal_terima: new Date().toISOString().split('T')[0], catatan: '' });
     const res = await atkApi.distribusi.list({ perPage: '100', status: 'dikirim' });
     setDistribusiList(res.data);
     setShowForm(true);
@@ -95,6 +98,9 @@ export default function ATKPenerimaanPage() {
                   <option value="">-- Pilih --</option>
                   {distribusiList.map(d => <option key={d.id} value={d.id}>{d.nomor_distribusi} - {d.cabang?.nama} ({d.bulan}/{d.tahun})</option>)}
                 </select>
+                {distribusiList.length === 0 && (
+                  <div className="alert alert-info mt-2 mb-0 py-2 small">Belum ada distribusi dengan status Dikirim. Buat distribusi terlebih dahulu dan ubah statusnya menjadi Dikirim.</div>
+                )}
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
