@@ -19,7 +19,7 @@ app.get('/', async (c) => {
 
   let query = supabase
     .from('kendaraan_booking')
-    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model), peminjam:users!id_user(nama)', { count: 'exact' });
+    .select('*, kendaraan!id_kendaraan(nomor_polisi, merk, model), peminjam:users!id_user(nama)', { count: 'exact' });
 
   if (c.req.query('status')) query = query.eq('status', c.req.query('status'));
   if (c.req.query('id_kendaraan')) query = query.eq('id_kendaraan', c.req.query('id_kendaraan'));
@@ -32,7 +32,12 @@ app.get('/', async (c) => {
   const { data, error: err, count } = await query;
   if (err) return validationError(c, err.message);
 
-  return success(c, data, undefined, {
+  const mapped = (data || []).map(r => ({
+    ...r,
+    kendaraan: r.kendaraan ? { ...r.kendaraan, nopol: r.kendaraan.nomor_polisi } : undefined,
+  }));
+
+  return success(c, mapped, undefined, {
     page, perPage, total: count || 0, totalPages: Math.ceil((count || 0) / perPage),
   });
 });
@@ -77,10 +82,14 @@ app.post('/', async (c) => {
       driver: body.driver,
       status: 'diajukan',
     })
-    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model)')
+    .select('*, kendaraan!id_kendaraan(nomor_polisi, merk, model)')
     .single();
 
   if (err) return validationError(c, err.message);
+
+  if (data.kendaraan) {
+    data.kendaraan.nopol = data.kendaraan.nomor_polisi;
+  }
 
   logAudit(c, { tipe_aksi: AUDIT_ACTION.INSERT, modul: MODUL.VEHICLE, nama_tabel: 'kendaraan_booking', id_record: data.id, data_baru: data, deskripsi: `Booking ${nomorBooking}` });
   return created(c, data, `Booking ${nomorBooking} berhasil diajukan`);
@@ -99,10 +108,14 @@ app.patch('/:id/setujui', requireRole(['SA', 'HGA']), async (c) => {
     .from('kendaraan_booking')
     .update({ status: 'disetujui', approved_by: user.id, approved_at: new Date().toISOString() })
     .eq('id', id)
-    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model)')
+    .select('*, kendaraan!id_kendaraan(nomor_polisi, merk, model)')
     .single();
 
   if (err) return validationError(c, err.message);
+
+  if (data.kendaraan) {
+    data.kendaraan.nopol = data.kendaraan.nomor_polisi;
+  }
 
   logAudit(c, { tipe_aksi: AUDIT_ACTION.APPROVE, modul: MODUL.VEHICLE, nama_tabel: 'kendaraan_booking', id_record: id, deskripsi: `Booking ${existing.nomor_booking} disetujui` });
   return success(c, data, 'Booking disetujui');
@@ -121,10 +134,14 @@ app.patch('/:id/tolak', requireRole(['SA', 'HGA']), async (c) => {
     .from('kendaraan_booking')
     .update({ status: 'ditolak', catatan_penolakan: catatan, approved_by: user.id, approved_at: new Date().toISOString() })
     .eq('id', id)
-    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model)')
+    .select('*, kendaraan!id_kendaraan(nomor_polisi, merk, model)')
     .single();
 
   if (err) return validationError(c, err.message);
+
+  if (data.kendaraan) {
+    data.kendaraan.nopol = data.kendaraan.nomor_polisi;
+  }
 
   logAudit(c, { tipe_aksi: AUDIT_ACTION.REJECT, modul: MODUL.VEHICLE, nama_tabel: 'kendaraan_booking', id_record: id, deskripsi: `Booking ${existing.nomor_booking} ditolak` });
   return success(c, data, 'Booking ditolak');
@@ -149,10 +166,14 @@ app.patch('/:id/selesai', async (c) => {
       approved_at: new Date().toISOString(),
     })
     .eq('id', id)
-    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model)')
+    .select('*, kendaraan!id_kendaraan(nomor_polisi, merk, model)')
     .single();
 
   if (err) return validationError(c, err.message);
+
+  if (data.kendaraan) {
+    data.kendaraan.nopol = data.kendaraan.nomor_polisi;
+  }
 
   logAudit(c, { tipe_aksi: AUDIT_ACTION.UPDATE, modul: MODUL.VEHICLE, nama_tabel: 'kendaraan_booking', id_record: id, data_lama: existing, data_baru: data, deskripsi: `Booking ${existing.nomor_booking} selesai` });
   return success(c, data, 'Booking selesai');
