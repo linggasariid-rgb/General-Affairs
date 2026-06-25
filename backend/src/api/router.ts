@@ -24,7 +24,10 @@ import maintSLA from './v1/maintenance/sla';
 import purchaseRequest from './v1/procurement/purchase-request';
 import purchaseOrder from './v1/procurement/purchase-order';
 import penerimaan from './v1/procurement/penerimaan';
+import vehicle from './v1/vehicle/index';
 import vehicleBooking from './v1/vehicle/booking';
+import vehicleService from './v1/vehicle/service';
+import vehicleBbm from './v1/vehicle/bbm';
 import buildingChecklist from './v1/building/checklist';
 import buildingIssue from './v1/building/issue';
 
@@ -80,7 +83,10 @@ router.route('/procurement/po', purchaseOrder);
 router.route('/procurement/penerimaan', penerimaan);
 
 // Vehicle
+router.route('/vehicle', vehicle);
 router.route('/vehicle/booking', vehicleBooking);
+router.route('/vehicle/service', vehicleService);
+router.route('/vehicle/bbm', vehicleBbm);
 
 // Building
 router.route('/building/checklist', buildingChecklist);

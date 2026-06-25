@@ -14,18 +14,13 @@ app.use('*', authMiddleware);
 
 app.get('/', async (c) => {
   const supabase = getSupabase(c.env);
-  const user = c.get('user');
-  const roleCode = c.get('roleCode');
   const page = parseInt(c.req.query('page') || '1');
   const perPage = parseInt(c.req.query('perPage') || '10');
 
   let query = supabase
-    .from('vehicle_booking')
-    .select('*, kendaraan!inner(nomor_plat, merek, model), cabang!inner(nama), peminjam:users!created_by(nama)', { count: 'exact' });
+    .from('kendaraan_booking')
+    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model), peminjam:users!id_user(nama)', { count: 'exact' });
 
-  if (['KCB', 'PCB'].includes(roleCode) && user.id_cabang) {
-    query = query.eq('id_cabang', user.id_cabang);
-  }
   if (c.req.query('status')) query = query.eq('status', c.req.query('status'));
   if (c.req.query('id_kendaraan')) query = query.eq('id_kendaraan', c.req.query('id_kendaraan'));
   if (c.req.query('tanggal_mulai')) query = query.gte('tanggal_mulai', c.req.query('tanggal_mulai'));
@@ -53,7 +48,7 @@ app.post('/', async (c) => {
 
   const { data: kendaraan } = await supabase
     .from('kendaraan')
-    .select('*, cabang!inner(id)')
+    .select('id')
     .eq('id', body.id_kendaraan)
     .single();
 
@@ -61,18 +56,18 @@ app.post('/', async (c) => {
 
   const tahun = new Date().getFullYear();
   const { count } = await supabase
-    .from('vehicle_booking')
+    .from('kendaraan_booking')
     .select('*', { count: 'exact', head: true })
     .like('nomor_booking', `BKG-${tahun}-%`);
 
   const nomorBooking = generateNomorBooking(tahun, (count || 0) + 1);
 
   const { data, error: err } = await supabase
-    .from('vehicle_booking')
+    .from('kendaraan_booking')
     .insert({
       nomor_booking: nomorBooking,
       id_kendaraan: body.id_kendaraan,
-      id_cabang: kendaraan.id_cabang,
+      id_user: user.id,
       tujuan: body.tujuan,
       lokasi_tujuan: body.lokasi_tujuan,
       tanggal_mulai: body.tanggal_mulai,
@@ -81,14 +76,13 @@ app.post('/', async (c) => {
       jumlah_penumpang: body.jumlah_penumpang,
       driver: body.driver,
       status: 'diajukan',
-      created_by: user.id,
     })
-    .select('*, kendaraan(nomor_plat, merek, model)')
+    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model)')
     .single();
 
   if (err) return validationError(c, err.message);
 
-  logAudit(c, { tipe_aksi: AUDIT_ACTION.INSERT, modul: MODUL.VEHICLE, nama_tabel: 'vehicle_booking', id_record: data.id, data_baru: data, deskripsi: `Booking ${nomorBooking} untuk ${kendaraan.nomor_plat}` });
+  logAudit(c, { tipe_aksi: AUDIT_ACTION.INSERT, modul: MODUL.VEHICLE, nama_tabel: 'kendaraan_booking', id_record: data.id, data_baru: data, deskripsi: `Booking ${nomorBooking}` });
   return created(c, data, `Booking ${nomorBooking} berhasil diajukan`);
 });
 
@@ -97,20 +91,20 @@ app.patch('/:id/setujui', requireRole(['SA', 'HGA']), async (c) => {
   const user = c.get('user');
   const { id } = c.req.param();
 
-  const { data: existing } = await supabase.from('vehicle_booking').select('*').eq('id', id).single();
+  const { data: existing } = await supabase.from('kendaraan_booking').select('*').eq('id', id).single();
   if (!existing) return notFound(c, 'Booking tidak ditemukan');
   if (existing.status !== 'diajukan') return validationError(c, 'Booking sudah diproses');
 
   const { data, error: err } = await supabase
-    .from('vehicle_booking')
+    .from('kendaraan_booking')
     .update({ status: 'disetujui', approved_by: user.id, approved_at: new Date().toISOString() })
     .eq('id', id)
-    .select('*, kendaraan(nomor_plat, merek, model)')
+    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model)')
     .single();
 
   if (err) return validationError(c, err.message);
 
-  logAudit(c, { tipe_aksi: AUDIT_ACTION.APPROVE, modul: MODUL.VEHICLE, nama_tabel: 'vehicle_booking', id_record: id, deskripsi: `Booking ${existing.nomor_booking} disetujui` });
+  logAudit(c, { tipe_aksi: AUDIT_ACTION.APPROVE, modul: MODUL.VEHICLE, nama_tabel: 'kendaraan_booking', id_record: id, deskripsi: `Booking ${existing.nomor_booking} disetujui` });
   return success(c, data, 'Booking disetujui');
 });
 
@@ -120,19 +114,19 @@ app.patch('/:id/tolak', requireRole(['SA', 'HGA']), async (c) => {
   const { id } = c.req.param();
   const { catatan } = await c.req.json();
 
-  const { data: existing } = await supabase.from('vehicle_booking').select('*').eq('id', id).single();
+  const { data: existing } = await supabase.from('kendaraan_booking').select('*').eq('id', id).single();
   if (!existing) return notFound(c, 'Booking tidak ditemukan');
 
   const { data, error: err } = await supabase
-    .from('vehicle_booking')
+    .from('kendaraan_booking')
     .update({ status: 'ditolak', catatan_penolakan: catatan, approved_by: user.id, approved_at: new Date().toISOString() })
     .eq('id', id)
-    .select('*, kendaraan(nomor_plat, merek, model)')
+    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model)')
     .single();
 
   if (err) return validationError(c, err.message);
 
-  logAudit(c, { tipe_aksi: AUDIT_ACTION.REJECT, modul: MODUL.VEHICLE, nama_tabel: 'vehicle_booking', id_record: id, deskripsi: `Booking ${existing.nomor_booking} ditolak` });
+  logAudit(c, { tipe_aksi: AUDIT_ACTION.REJECT, modul: MODUL.VEHICLE, nama_tabel: 'kendaraan_booking', id_record: id, deskripsi: `Booking ${existing.nomor_booking} ditolak` });
   return success(c, data, 'Booking ditolak');
 });
 
@@ -142,25 +136,25 @@ app.patch('/:id/selesai', async (c) => {
   const { id } = c.req.param();
   const { catatan, jarak_tempuh } = await c.req.json();
 
-  const { data: existing } = await supabase.from('vehicle_booking').select('*').eq('id', id).single();
+  const { data: existing } = await supabase.from('kendaraan_booking').select('*').eq('id', id).single();
   if (!existing) return notFound(c, 'Booking tidak ditemukan');
 
   const { data, error: err } = await supabase
-    .from('vehicle_booking')
+    .from('kendaraan_booking')
     .update({
       status: 'selesai',
-      catatan_selesai: catatan,
-      jarak_tempuh: jarak_tempuh,
-      completed_by: user.id,
-      completed_at: new Date().toISOString(),
+      catatan: catatan,
+      kilometer_akhir: jarak_tempuh,
+      approved_by: user.id,
+      approved_at: new Date().toISOString(),
     })
     .eq('id', id)
-    .select('*, kendaraan(nomor_plat, merek, model)')
+    .select('*, kendaraan!id_kendaraan(nomor_polisi:nopol, merk, model)')
     .single();
 
   if (err) return validationError(c, err.message);
 
-  logAudit(c, { tipe_aksi: AUDIT_ACTION.UPDATE, modul: MODUL.VEHICLE, nama_tabel: 'vehicle_booking', id_record: id, data_lama: existing, data_baru: data, deskripsi: `Booking ${existing.nomor_booking} selesai` });
+  logAudit(c, { tipe_aksi: AUDIT_ACTION.UPDATE, modul: MODUL.VEHICLE, nama_tabel: 'kendaraan_booking', id_record: id, data_lama: existing, data_baru: data, deskripsi: `Booking ${existing.nomor_booking} selesai` });
   return success(c, data, 'Booking selesai');
 });
 

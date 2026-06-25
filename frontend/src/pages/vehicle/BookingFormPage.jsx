@@ -13,7 +13,7 @@ export default function BookingFormPage() {
   });
 
   useEffect(() => {
-    apiFetch('/vehicle?perPage=100&status=tersedia')
+    apiFetch('/vehicle?perPage=100&status=aktif')
       .then((res) => setVehicles(res.data || []))
       .catch(console.error);
   }, []);

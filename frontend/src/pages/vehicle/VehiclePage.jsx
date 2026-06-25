@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '../../services/api';
 
-const STATUS_BADGE = { tersedia: 'success', dipakai: 'warning', perbaikan: 'danger', nonaktif: 'secondary' };
+const STATUS_BADGE = { aktif: 'success', service: 'warning', rusak: 'danger', dihapus: 'secondary' };
+
+const STATUS_LABEL = { aktif: 'Tersedia', service: 'Service', rusak: 'Rusak', dihapus: 'Nonaktif' };
 
 export default function VehiclePage() {
   const navigate = useNavigate();
@@ -70,7 +72,7 @@ function DaftarKendaraan() {
                 <td>{v.tipe || '-'}</td>
                 <td>{v.tahun || '-'}</td>
                 <td>{v.warna || '-'}</td>
-                <td><span className={`badge bg-${STATUS_BADGE[v.status] || 'secondary'}`}>{v.status}</span></td>
+                <td><span className={`badge bg-${STATUS_BADGE[v.status] || 'secondary'}`}>{STATUS_LABEL[v.status] || v.status}</span></td>
                 <td><button className="btn btn-sm btn-outline-primary"><i className="bi bi-eye"></i></button></td>
               </tr>
             ))}
