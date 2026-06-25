@@ -58,6 +58,18 @@ export const masterApi = {
     create: (data) => request('/master/vendor', { method: 'POST', body: JSON.stringify(data) }),
     update: (id, data) => request(`/master/vendor/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   },
+  kategoriAsset: {
+    list: (params) => request(`/master/kategori-asset?${new URLSearchParams(params)}`),
+    get: (id) => request(`/master/kategori-asset/${id}`),
+    create: (data) => request('/master/kategori-asset', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/master/kategori-asset/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  },
+  lokasiAsset: {
+    list: (params) => request(`/master/lokasi-asset?${new URLSearchParams(params)}`),
+    get: (id) => request(`/master/lokasi-asset/${id}`),
+    create: (data) => request('/master/lokasi-asset', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id, data) => request(`/master/lokasi-asset/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  },
 };
 
 // Asset

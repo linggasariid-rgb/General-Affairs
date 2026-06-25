@@ -29,12 +29,16 @@ export default function AssetFormPage() {
 
   async function fetchReferences() {
     try {
-      const [cabang, kategori] = await Promise.all([
+      const [cabang, kategori, gudang, lokasi] = await Promise.all([
         masterApi.cabang.list({ perPage: '100' }),
         masterApi.kategoriAsset.list({ perPage: '100' }),
+        masterApi.gudang.list({ perPage: '100' }),
+        masterApi.lokasiAsset.list({ perPage: '100' }),
       ]);
       setCabangList(cabang.data);
       setKategoriList(kategori.data);
+      setGudangList(gudang.data);
+      setLokasiList(lokasi.data);
     } catch (err) {
       console.error(err);
     }
@@ -73,7 +77,7 @@ export default function AssetFormPage() {
       } else {
         await assetApi.create(form);
       }
-      navigate('/app/asset');
+      navigate('/asset');
     } catch (err) {
       console.error(err);
     } finally {
