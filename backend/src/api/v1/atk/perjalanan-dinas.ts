@@ -103,6 +103,55 @@ app.put('/:id', requireRole(['SA', 'HGA', 'SGA']), async (c) => {
   return success(c, data, 'SPK berhasil diupdate');
 });
 
+app.delete('/:id', requireRole(['SA', 'HGA', 'SGA']), async (c) => {
+  const supabase = getSupabase(c.env);
+  const { id } = c.req.param();
+
+  const { data: existing } = await supabase.from('spk_perjalanan_dinas').select('*').eq('id', id).single();
+  if (!existing) return notFound(c, 'SPK tidak ditemukan');
+  if (existing.status !== 'dipakai') return validationError(c, 'Hanya SPK aktif yang bisa dihapus');
+
+  const { error } = await supabase.from('spk_perjalanan_dinas').delete().eq('id', id);
+  if (error) return validationError(c, error.message);
+  return success(c, null, 'SPK berhasil dihapus');
+});
+
+app.post('/upload', requireRole(['SA', 'HGA', 'SGA']), async (c) => {
+  const env = c.env;
+  const body = await c.req.json();
+
+  const matches = body.file.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+  if (!matches) return validationError(c, 'Format file tidak valid');
+
+  const mimeType = matches[1];
+  const base64Data = matches[2];
+  const raw = atob(base64Data);
+  const buffer = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) buffer[i] = raw.charCodeAt(i);
+
+  const ext = mimeType.split('/')[1] || 'jpg';
+  const filename = `${crypto.randomUUID()}.${ext}`;
+
+  const bucket = 'bukti-pengeluaran';
+
+  await fetch(`${env.SUPABASE_URL}/storage/v1/bucket`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: bucket, public: true, allowed_mime_types: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'] }),
+  });
+
+  const uploadRes = await fetch(`${env.SUPABASE_URL}/storage/v1/object/${bucket}/${filename}`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`, 'Content-Type': mimeType },
+    body: buffer,
+  });
+
+  if (!uploadRes.ok) return validationError(c, 'Gagal upload file');
+
+  const url = `${env.SUPABASE_URL}/storage/v1/object/public/${bucket}/${filename}`;
+  return success(c, { url, filename });
+});
+
 app.post('/:id/kembali', requireRole(['SA', 'HGA', 'SGA']), async (c) => {
   const supabase = getSupabase(c.env);
   const { id } = c.req.param();
@@ -130,6 +179,7 @@ app.post('/:id/kembali', requireRole(['SA', 'HGA', 'SGA']), async (c) => {
         jenis: p.jenis,
         jumlah: p.jumlah,
         keterangan: p.keterangan || '',
+        bukti: p.bukti || null,
       }));
       await supabase.from('etoll_pengeluaran').insert(pengeluaran);
     }

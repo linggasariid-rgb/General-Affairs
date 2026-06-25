@@ -130,6 +130,7 @@ export default function App() {
         <Route path="atk/pengajuan-barang-non-rutin/:id" element={<PengajuanNonRutinDetailPage />} />
         <Route path="atk/perjalanan-dinas" element={<PerjalananDinasPage />} />
         <Route path="atk/perjalanan-dinas/new" element={<PerjalananDinasFormPage />} />
+        <Route path="atk/perjalanan-dinas/:id/edit" element={<PerjalananDinasFormPage />} />
         <Route path="atk/perjalanan-dinas/:id" element={<PerjalananDinasDetailPage />} />
 
         {/* Audit */}

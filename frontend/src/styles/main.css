@@ -21,6 +21,8 @@ body {
 .sidebar {
   width: var(--ga-sidebar-width);
   height: 100vh;
+  position: sticky;
+  top: 0;
   overflow: hidden;
   background: var(--ga-sidebar-bg);
 }

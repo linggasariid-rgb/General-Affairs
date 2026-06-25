@@ -163,7 +163,9 @@ export const atkApi = {
     get: (id) => request(`/atk/perjalanan-dinas/${id}`),
     create: (data) => request('/atk/perjalanan-dinas', { method: 'POST', body: JSON.stringify(data) }),
     update: (id, data) => request(`/atk/perjalanan-dinas/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id) => request(`/atk/perjalanan-dinas/${id}`, { method: 'DELETE' }),
     kembali: (id, data) => request(`/atk/perjalanan-dinas/${id}/kembali`, { method: 'POST', body: JSON.stringify(data) }),
+    upload: (data) => request('/atk/perjalanan-dinas/upload', { method: 'POST', body: JSON.stringify(data) }),
   },
   pengajuan: {
     list: (params) => request(`/atk/pengajuan-barang-non-rutin?${new URLSearchParams(params)}`),

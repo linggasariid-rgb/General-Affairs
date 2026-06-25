@@ -10,7 +10,7 @@ export default function PerjalananDinasDetailPage() {
   const [loading, setLoading] = useState(true);
   const [showReturn, setShowReturn] = useState(false);
   const [returnForm, setReturnForm] = useState({ tanggal_kembali: new Date().toISOString().split('T')[0] });
-  const [expenses, setExpenses] = useState([{ jenis: 'bensin', jumlah: '', keterangan: '' }]);
+  const [expenses, setExpenses] = useState([{ jenis: 'bensin', jumlah: '', keterangan: '', file: null, bukti: '' }]);
 
   useEffect(() => { fetchData(); }, [id]);
 
@@ -25,7 +25,7 @@ export default function PerjalananDinasDetailPage() {
   }
 
   function addExpense() {
-    setExpenses([...expenses, { jenis: 'bensin', jumlah: '', keterangan: '' }]);
+    setExpenses([...expenses, { jenis: 'bensin', jumlah: '', keterangan: '', file: null, bukti: '' }]);
   }
 
   function updateExpense(i, field, value) {
@@ -36,6 +36,15 @@ export default function PerjalananDinasDetailPage() {
     setExpenses(expenses.filter((_, idx) => idx !== i));
   }
 
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function handleReturn(e) {
     e.preventDefault();
     const validExpenses = expenses.filter(ex => ex.jenis && Number(ex.jumlah) > 0);
@@ -44,14 +53,23 @@ export default function PerjalananDinasDetailPage() {
       return;
     }
 
+    Swal.fire({ title: 'Mengupload bukti...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
     try {
+      const pengeluaran = [];
+      for (const ex of validExpenses) {
+        let bukti = ex.bukti || '';
+        if (ex.file && !ex.bukti) {
+          const base64 = await toBase64(ex.file);
+          const res = await atkApi.perjalananDinas.upload({ file: base64, filename: ex.file.name });
+          bukti = res.data.url;
+        }
+        pengeluaran.push({ jenis: ex.jenis, jumlah: Number(ex.jumlah), keterangan: ex.keterangan, bukti });
+      }
+
       await atkApi.perjalananDinas.kembali(id, {
         tanggal_kembali: returnForm.tanggal_kembali,
-        pengeluaran: validExpenses.map(ex => ({
-          jenis: ex.jenis,
-          jumlah: Number(ex.jumlah),
-          keterangan: ex.keterangan,
-        })),
+        pengeluaran,
       });
       Swal.fire('Sukses', 'Pengembalian berhasil dicatat', 'success');
       setShowReturn(false);
@@ -86,9 +104,18 @@ export default function PerjalananDinasDetailPage() {
         </div>
         <div className="d-flex gap-2">
           {data.status === 'dipakai' && (
-            <button className="btn btn-success" onClick={() => { setReturnForm({ tanggal_kembali: new Date().toISOString().split('T')[0] }); setExpenses([{ jenis: 'bensin', jumlah: '', keterangan: '' }]); setShowReturn(true); }}>
-              <i className="bi bi-arrow-return-left me-1"></i>Catat Pengembalian
-            </button>
+            <>
+              <button className="btn btn-warning" onClick={() => navigate(`/atk/perjalanan-dinas/${id}/edit`)}>
+                <i className="bi bi-pencil me-1"></i>Edit
+              </button>
+              <button className="btn btn-success" onClick={() => { setReturnForm({ tanggal_kembali: new Date().toISOString().split('T')[0] }); setExpenses([{ jenis: 'bensin', jumlah: '', keterangan: '', file: null, bukti: '' }]); setShowReturn(true); }}>
+                <i className="bi bi-arrow-return-left me-1"></i>Catat Pengembalian
+              </button>
+              <button className="btn btn-outline-danger" onClick={async () => {
+                const { isConfirmed } = await Swal.fire({ title: 'Hapus SPK?', text: data.nomor_spk, icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: 'Ya, hapus' });
+                if (isConfirmed) { try { await atkApi.perjalananDinas.delete(id); Swal.fire('Sukses', 'SPK berhasil dihapus', 'success'); navigate('/atk/perjalanan-dinas'); } catch (err) { Swal.fire('Error', err.message, 'error'); } }
+              }}><i className="bi bi-trash me-1"></i>Hapus</button>
+            </>
           )}
           <button className="btn btn-outline-secondary" onClick={() => navigate('/atk/perjalanan-dinas')}>Kembali</button>
         </div>
@@ -137,7 +164,7 @@ export default function PerjalananDinasDetailPage() {
               <div className="table-responsive">
                 <table className="table mb-0">
                   <thead className="table-light">
-                    <tr><th>#</th><th>Jenis</th><th>Jumlah</th><th>Keterangan</th></tr>
+                    <tr><th>#</th><th>Jenis</th><th>Jumlah</th><th>Keterangan</th><th>Bukti</th></tr>
                   </thead>
                   <tbody>
                     {card.etoll_pengeluaran.map((p, i) => (
@@ -146,6 +173,11 @@ export default function PerjalananDinasDetailPage() {
                         <td><span className="badge bg-secondary">{p.jenis}</span></td>
                         <td className="fw-bold">Rp {Number(p.jumlah).toLocaleString()}</td>
                         <td>{p.keterangan || '-'}</td>
+                        <td>
+                          {p.bukti
+                            ? <a href={p.bukti} target="_blank" rel="noopener noreferrer"><i className="bi bi-paperclip"></i> Lihat</a>
+                            : '-'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -205,7 +237,7 @@ export default function PerjalananDinasDetailPage() {
                   </div>
                   <table className="table table-sm">
                     <thead className="table-light">
-                      <tr><th>Jenis</th><th>Jumlah (Rp)</th><th>Keterangan</th><th></th></tr>
+                      <tr><th>Jenis</th><th>Jumlah (Rp)</th><th>Keterangan</th><th>File Bukti</th><th></th></tr>
                     </thead>
                     <tbody>
                       {expenses.map((ex, i) => (
@@ -225,6 +257,14 @@ export default function PerjalananDinasDetailPage() {
                           <td>
                             <input className="form-control form-control-sm" value={ex.keterangan}
                               onChange={(e) => updateExpense(i, 'keterangan', e.target.value)} />
+                          </td>
+                          <td>
+                            <input className="form-control form-control-sm" type="file" accept="image/*,application/pdf"
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) updateExpense(i, 'file', file);
+                              }} />
+                            {ex.bukti && <small className="text-success"><i className="bi bi-check-circle"></i> Terupload</small>}
                           </td>
                           <td>
                             {expenses.length > 1 && (

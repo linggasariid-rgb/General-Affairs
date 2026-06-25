@@ -12,10 +12,8 @@ export default function HeadGADashboard() {
   const [loading, setLoading] = useState(true);
   const assetChartRef = useRef(null);
   const statusChartRef = useRef(null);
-  const trendChartRef = useRef(null);
   const assetChartInstance = useRef(null);
   const statusChartInstance = useRef(null);
-  const trendChartInstance = useRef(null);
 
   useEffect(() => {
     fetchDashboard();
@@ -25,7 +23,6 @@ export default function HeadGADashboard() {
     if (!stats) return;
     if (assetChartInstance.current) assetChartInstance.current.destroy();
     if (statusChartInstance.current) statusChartInstance.current.destroy();
-    if (trendChartInstance.current) trendChartInstance.current.destroy();
 
     const colors = ['#0d6efd','#6610f2','#6f42c1','#d63384','#dc3545','#fd7e14','#ffc107','#198754','#20c997','#0dcaf0'];
     const cabangLabels = (stats.assetPerCabang || []).map(c => c.nama);
@@ -53,20 +50,6 @@ export default function HeadGADashboard() {
       });
     }
 
-    if (trendChartRef.current) {
-      const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-      trendChartInstance.current = new Chart(trendChartRef.current, {
-        type: 'line',
-        data: {
-          labels: months,
-          datasets: [
-            { label: 'Ticket Masuk', data: stats.trendTicket || Array(12).fill(0), borderColor: '#0d6efd', fill: false, tension: 0.3 },
-            { label: 'PR Dibuat', data: stats.trendPR || Array(12).fill(0), borderColor: '#198754', fill: false, tension: 0.3 },
-          ],
-        },
-        options: { responsive: true, maintainAspectRatio: false, interaction: { intersect: false, mode: 'index' } },
-      });
-    }
   }, [stats]);
 
   async function fetchDashboard() {
@@ -145,59 +128,6 @@ export default function HeadGADashboard() {
             </div>
             <div className="card-body" style={{ height: 300 }}>
               <canvas ref={statusChartRef}></canvas>
-            </div>
-          </div>
-        </div>
-
-        {/* Trend Chart */}
-        <div className="col-12">
-          <div className="card shadow-sm">
-            <div className="card-header bg-white">
-              <h6 className="mb-0">Trend Bulanan</h6>
-            </div>
-            <div className="card-body" style={{ height: 250 }}>
-              <canvas ref={trendChartRef}></canvas>
-            </div>
-          </div>
-        </div>
-
-        {/* Overdue Tickets */}
-        <div className="col-12">
-          <div className="card shadow-sm">
-            <div className="card-header bg-white d-flex justify-content-between align-items-center">
-              <h6 className="mb-0">Ticket Overdue SLA</h6>
-              <span className="badge bg-danger">{stats?.overdueTicket || 0} Overdue</span>
-            </div>
-            <div className="card-body p-0">
-              <div className="table-responsive">
-                <table className="table table-hover mb-0">
-                  <thead className="table-light">
-                    <tr>
-                      <th>Ticket</th>
-                      <th>Cabang</th>
-                      <th>Asset</th>
-                      <th>Prioritas</th>
-                      <th>Durasi</th>
-                      <th>Teknisi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(stats?.overdueTickets || []).map((t) => (
-                      <tr key={t.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/maintenance/ticket/${t.id}`)}>
-                        <td><strong>{t.nomor_ticket}</strong></td>
-                        <td>{t.cabang?.nama || '-'}</td>
-                        <td>{t.asset?.nama || '-'}</td>
-                        <td><span className={`badge bg-${t.prioritas === 'critical' ? 'danger' : t.prioritas === 'high' ? 'warning' : 'secondary'}`}>{t.prioritas}</span></td>
-                        <td>{t.durasi || '-'}</td>
-                        <td>{t.teknisi?.nama || t.vendor?.nama || '-'}</td>
-                      </tr>
-                    ))}
-                    {(!stats?.overdueTickets || stats.overdueTickets.length === 0) && (
-                      <tr><td colSpan="6" className="text-center text-muted py-3">Tidak ada ticket overdue</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
             </div>
           </div>
         </div>

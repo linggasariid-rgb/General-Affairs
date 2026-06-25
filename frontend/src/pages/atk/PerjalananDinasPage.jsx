@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { atkApi } from '../../services/api';
+import Swal from 'sweetalert2';
 
 export default function PerjalananDinasPage() {
   const navigate = useNavigate();
@@ -76,9 +77,26 @@ export default function PerjalananDinasPage() {
                     <td>{card ? <>{card.nomor_kartu}{cardStatusBadge(card.status)}</> : '-'}</td>
                     <td>{statusBadge(item.status)}</td>
                     <td>
-                      <button className="btn btn-sm btn-outline-info" onClick={() => navigate(`/atk/perjalanan-dinas/${item.id}`)} title="Detail">
-                        <i className="bi bi-eye"></i>
-                      </button>
+                      <div className="d-flex gap-1">
+                        <button className="btn btn-sm btn-outline-info" onClick={() => navigate(`/atk/perjalanan-dinas/${item.id}`)} title="Detail">
+                          <i className="bi bi-eye"></i>
+                        </button>
+                        {item.status === 'dipakai' && (
+                          <>
+                            <button className="btn btn-sm btn-outline-warning" onClick={() => navigate(`/atk/perjalanan-dinas/${item.id}/edit`)} title="Edit">
+                              <i className="bi bi-pencil"></i>
+                            </button>
+                            <button className="btn btn-sm btn-outline-danger" onClick={async () => {
+                              const { isConfirmed } = await Swal.fire({ title: 'Hapus SPK?', text: item.nomor_spk, icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc3545', confirmButtonText: 'Ya, hapus' });
+                              if (isConfirmed) {
+                                try { await atkApi.perjalananDinas.delete(item.id); Swal.fire('Sukses', 'SPK berhasil dihapus', 'success'); fetchData(); } catch (err) { Swal.fire('Error', err.message, 'error'); }
+                              }
+                            }} title="Hapus">
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

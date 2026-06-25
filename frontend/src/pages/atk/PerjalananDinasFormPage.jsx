@@ -1,16 +1,41 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { atkApi } from '../../services/api';
 import Swal from 'sweetalert2';
 
 export default function PerjalananDinasFormPage() {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const isEdit = !!id;
+  const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     nomor_spk: '', nama_pelaksana: '', divisi: '', tujuan: '',
     tanggal_berangkat: '', tanggal_kembali: '', keterangan: '',
     nomor_kartu: '', tanggal_pinjam: '',
   });
+
+  useEffect(() => {
+    if (isEdit) {
+      atkApi.perjalananDinas.get(id).then(res => {
+        const d = res.data;
+        setForm({
+          nomor_spk: d.nomor_spk,
+          nama_pelaksana: d.nama_pelaksana,
+          divisi: d.divisi,
+          tujuan: d.tujuan,
+          tanggal_berangkat: d.tanggal_berangkat,
+          tanggal_kembali: d.tanggal_kembali,
+          keterangan: d.keterangan || '',
+          nomor_kartu: d.etoll_peminjaman?.[0]?.nomor_kartu || '',
+          tanggal_pinjam: d.etoll_peminjaman?.[0]?.tanggal_pinjam || '',
+        });
+      }).catch(err => {
+        Swal.fire('Error', err.message, 'error');
+        navigate('/atk/perjalanan-dinas');
+      }).finally(() => setLoading(false));
+    }
+  }, [id]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -34,8 +59,13 @@ export default function PerjalananDinasFormPage() {
         payload.nomor_kartu = form.nomor_kartu;
         payload.tanggal_pinjam = form.tanggal_pinjam;
       }
-      await atkApi.perjalananDinas.create(payload);
-      Swal.fire('Sukses', 'SPK berhasil dibuat', 'success');
+      if (isEdit) {
+        await atkApi.perjalananDinas.update(id, payload);
+        Swal.fire('Sukses', 'SPK berhasil diupdate', 'success');
+      } else {
+        await atkApi.perjalananDinas.create(payload);
+        Swal.fire('Sukses', 'SPK berhasil dibuat', 'success');
+      }
       navigate('/atk/perjalanan-dinas');
     } catch (err) {
       Swal.fire('Error', err.message, 'error');
@@ -44,11 +74,13 @@ export default function PerjalananDinasFormPage() {
     }
   }
 
+  if (loading) return <div className="text-center py-5"><div className="spinner-border" /></div>;
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h4 className="mb-1">Buat SPK Perjalanan Dinas</h4>
+          <h4 className="mb-1">{isEdit ? 'Edit' : 'Buat'} SPK Perjalanan Dinas</h4>
           <small className="text-muted">Input SPK dan terbitkan kartu E-Toll</small>
         </div>
       </div>
@@ -109,7 +141,7 @@ export default function PerjalananDinasFormPage() {
         <div className="d-flex gap-2">
           <button type="submit" className="btn btn-primary" disabled={saving}>
             {saving ? <span className="spinner-border spinner-border-sm me-1" /> : <i className="bi bi-save me-1"></i>}
-            Simpan SPK
+            {isEdit ? 'Update SPK' : 'Simpan SPK'}
           </button>
           <button type="button" className="btn btn-secondary" onClick={() => navigate('/atk/perjalanan-dinas')}>Batal</button>
         </div>
