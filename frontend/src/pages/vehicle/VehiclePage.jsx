@@ -98,7 +98,7 @@ function BookingList() {
   return (
     <div>
       <div className="d-flex justify-content-end mb-3">
-        <button className="btn btn-primary btn-sm" onClick={() => navigate('/app/vehicle/booking/create')}>
+        <button className="btn btn-primary btn-sm" onClick={() => navigate('/vehicle/booking/create')}>
           <i className="bi bi-plus-lg me-1"></i>Booking Baru
         </button>
       </div>

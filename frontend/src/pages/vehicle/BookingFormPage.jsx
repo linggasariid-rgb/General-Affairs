@@ -30,7 +30,7 @@ export default function BookingFormPage() {
         method: 'POST',
         body: JSON.stringify(form),
       });
-      navigate('/app/vehicle');
+      navigate('/vehicle');
     } catch (err) {
       console.error(err);
     } finally {
@@ -93,7 +93,7 @@ export default function BookingFormPage() {
             {saving ? <span className="spinner-border spinner-border-sm me-1" /> : null}
             Simpan Booking
           </button>
-          <button type="button" className="btn btn-secondary" onClick={() => navigate('/app/vehicle')}>Batal</button>
+          <button type="button" className="btn btn-secondary" onClick={() => navigate('/vehicle')}>Batal</button>
         </div>
       </form>
     </div>
